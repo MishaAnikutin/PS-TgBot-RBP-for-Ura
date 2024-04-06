@@ -2,7 +2,7 @@
 
 # Installing 
 ```bash 
-sudo xmod +x ./setup.sh && ./setup.sh
+sudo cmod +x ./setup.sh && ./setup.sh
 ```
 
 ## Running
