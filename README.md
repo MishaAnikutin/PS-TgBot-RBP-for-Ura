@@ -1,5 +1,7 @@
 # Print-Server with Telegram-bot client and Raspberry-pi server
 
+**NOT STABLE VERSION!**
+
 This template is designed for remote printing tasks, sending files to them via a telegram bot located in Raspberry-Pi and connected directly to the printer
 
 # Installing 
