@@ -26,7 +26,6 @@ def cli():
     
     os.environ["PRINTER_API"] = model
     print("Настройка завершена, запуск программы")
-    subprocess.run(["python3", 'src/main.py'])    
 
 
 if __name__ == "__main__":
