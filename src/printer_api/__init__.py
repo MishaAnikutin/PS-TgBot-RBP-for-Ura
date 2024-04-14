@@ -1,7 +1,7 @@
 from ..secrets.config import PRINTER_API
 
 
-if PRINTER_API == "kyocera":
+if PRINTER_API == 'Kyocera P3145dn':
     from .kyocera_api import PrinterAPI
     
 else:

@@ -23,4 +23,4 @@ PAYMENT_CONF2 = os.getenv("PAYMENT_CONF2")
 
 RETURN_URL = 'https://t.me/prnt_server_bot'
 PAYMENT_API = "yookassa"
-PRINTER_API = "kyocera"
+PRINTER_API = os.getenv("PRINTER_API")

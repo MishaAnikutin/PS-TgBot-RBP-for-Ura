@@ -18,4 +18,10 @@ class BasePrinterAPI(ABC):
     @abstractclassmethod
     def print_files(cls, file: BaseFile, num_copies: int) -> None:
         ...
-    
+
+class PrinterExceptions(Exception):
+    def __init__(self, message):
+        self.message = message
+
+    def __str__(self):
+        return f'DBException: {self.message}'
