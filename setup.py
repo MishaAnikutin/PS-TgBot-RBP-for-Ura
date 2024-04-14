@@ -25,7 +25,7 @@ def cli():
             break
     
     os.environ["PRINTER_API"] = model
-    print("Настройка завершена, запуск программы")
+    print("Настройка завершена успешно!")
 
 
 if __name__ == "__main__":
