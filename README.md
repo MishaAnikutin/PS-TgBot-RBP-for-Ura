@@ -11,6 +11,7 @@ Next setup and configure your Print-server
 ```bash 
 sudo cmod +x ./setup.sh && ./setup.sh
 ```
+It will install all requirements
 
 Choose your printer in cli:
 ```bash
