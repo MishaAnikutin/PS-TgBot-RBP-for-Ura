@@ -7,7 +7,12 @@ This template is designed for remote printing tasks, sending files to them via a
 # Installing 
 firstly, connect your printer (via USB-b, Ethernet or Wi-Fi) to configured Raspberry-Pi 
 
-Next setup and configure your Print-server
+Secondly, clone this repository to your Raspberry-Pi:
+```bash
+git clone https://github.com/MishaAnikutin/PS-TgBot-RBP-for-Ura.git
+```
+
+Next step, run setup script
 ```bash 
 sudo cmod +x ./setup.sh && ./setup.sh
 ```
