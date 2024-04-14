@@ -10,10 +10,9 @@ from .bot_handlers import router
 from .database import CRUDActions
 
 logging.basicConfig(level=logging.INFO)
-
+    
 
 async def main():
-    # TODO: add mailing server
     logging.info('creating table')
     CRUDActions.create_table()
     
@@ -33,6 +32,4 @@ if __name__ == "__main__":
         asyncio.run(main())
         
     except KeyboardInterrupt:
-        logging.warning('stopping all processes...')
-        # stop_mailing_server()
-        logging.warning('--BOT STOPPED--')
+        logging.warning('--PROGRAM STOPPED--')

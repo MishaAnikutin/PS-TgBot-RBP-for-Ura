@@ -13,7 +13,7 @@ API_TOKEN = os.getenv("API_TOKEN")
 PRINTER_HOST = os.getenv("PRINTER_HOST")
 PRINTER_PORT = os.getenv("PRINTER_PORT")
 
-ADMIN_ID = os.getenv("ADMIN_ID")
+ADMIN_ID = [int(uid) for uid in os.getenv("ADMIN_ID").split(',')]
 
 PAGE_PRICE = os.getenv("PAGE_PRICE")
 

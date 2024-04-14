@@ -26,3 +26,6 @@ class BaseCRUD(ABC):
     def select_user(self):
         ...
     
+    @abstractclassmethod
+    def get_all_users(self):
+        ...

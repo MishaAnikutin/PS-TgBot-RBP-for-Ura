@@ -3,9 +3,15 @@ from .models import UserCRUDModel
 from ..models.user_model import UserData
 
 import sqlite3
-
+from typing import List, Generator, Optional
+import asyncio
 
 class CRUDActions(BaseCRUD):
+    class Metadata:
+        SYNC = True
+        ENGINE = 'sqilte3'
+        
+    
     db = sqlite3.connect('./src/database/db.sqlite')
 
 
@@ -14,7 +20,14 @@ class CRUDActions(BaseCRUD):
         conn = cls.db.cursor()
 
         try:
-            conn.execute('''CREATE TABLE IF NOT EXISTS users (uid int, username text);''')
+            conn.execute('''
+                CREATE TABLE IF NOT EXISTS users (
+                    uid int, 
+                    username text,
+                    ID INTEGER PRIMARY KEY AUTOINCREMENT
+                );
+                ''')
+            
             cls.db.commit()
         finally:
             conn.close()
@@ -60,3 +73,41 @@ class CRUDActions(BaseCRUD):
             raise DBException('user {uid} not in database')
         else:
             return result
+    
+    
+    @classmethod
+    def __get_user_by_index(cls, index) -> UserCRUDModel:
+        conn = cls.db.cursor()
+
+        try:
+            conn.execute(f'SELECT * FROM users WHERE ID == {index};')
+            data = conn.fetchone()
+        finally:
+            conn.close()
+        
+        user = UserCRUDModel(uid=data[0], username=data[1])
+        return user
+        
+    
+    @classmethod
+    def count_users(cls) -> int:
+        conn = cls.db.cursor()
+
+        try:
+            conn.execute(f'SELECT max(ID) FROM users;')
+            data = conn.fetchone()
+        finally:
+            conn.close()
+        
+        return data[0] if data != [] else 0
+        
+    
+    @classmethod
+    def usersGenerator(cls) -> Generator[UserCRUDModel, None, None]:
+        index = 1
+        n = cls.count_users() + 1
+        
+        while index < n:
+            user = cls.__get_user_by_index(index)
+            index += 1 
+            yield user
