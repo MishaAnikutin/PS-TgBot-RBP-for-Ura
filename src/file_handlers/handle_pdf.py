@@ -14,4 +14,4 @@ class PDFFile(BaseFile):
         return self._bytes
 
     def get_number_pages(self) -> int:
-        return len(self.file.pages)
+        return len(self._file.pages)

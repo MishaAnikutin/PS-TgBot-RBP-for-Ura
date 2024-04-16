@@ -59,12 +59,12 @@ async def handle_files(message: Message, state: FSMContext, bot: Bot):
     file_info = await bot.get_file(message.document.file_id)
     file_bytes: io.BytesIO = await bot.download_file(file_path=file_info.file_path)
 
-    # try:
-    document = create_document(file_path=file_info.file_path, file_bytes=file_bytes)
+    try:
+        document = create_document(file_path=file_info.file_path, file_bytes=file_bytes)
     
-    # except ValueError as exc:
-    #     await message.answer(f'Неверный формат файлов, файл должен быть формата: {", ".join(ALLOWED_FORMATS)}')
-    #     await state.clear()
+    except ValueError as exc:
+        await message.answer(f'Неверный формат файлов, файл должен быть формата: {", ".join(ALLOWED_FORMATS)}')
+        return await state.clear()
         
     num_pages = document.get_number_pages()
 
@@ -107,8 +107,11 @@ async def handle_number_of_copies(message: Message, state: FSMContext):
         return await message.answer("Введите число!")
     
     data: UserData = (await state.get_data())['user_data']
+    data.num_copies = num_of_copies
+    
     printer_capacity = await PrinterAPI.get_printer_capacity()
     total_pages = data.file_data.num_pages * num_of_copies
+    data.value = Page.total_value(total_pages)
     
     if printer_capacity < total_pages:
         await state.clear()
@@ -119,9 +122,7 @@ async def handle_number_of_copies(message: Message, state: FSMContext):
             reply_markup=await stop_keyboard(callback_factory=HandleFileCallback, text='Назад')
         )
 
-    data: UserData = (await state.get_data())['user_data']
-    data.value = Page.total_value(total_pages)
-    
+    await state.set_data({'user_data': data})
     await message.answer(
         f"Отлично! Тогда, получается:\n\n"\
         f"- {num_of_copies} копии(-й) файла {data.file_data.filename} ({data.file_data.num_pages} страниц)\n\n"
@@ -156,17 +157,19 @@ async def make_purchase_handler(call: CallbackQuery, state: FSMContext):
 async def check_payment_handler(call: CallbackQuery, state: FSMContext):
     data: UserData = (await state.get_data())['user_data']
     
+    print(data)
+    
     # Реализация логики проверки оплаты  
     is_succeed: bool = True 
     
     if is_succeed:
-        await state.clear()
         try:
             await PrinterAPI.print_files(file=data.file_data.file_bytes, num_copies=data.num_copies)
         except Exception as exc:
-            return await call.message.answer(f"Произошла непредвиденная ошибка:\n\n{exc}\nНапишите в техподдержку")
+            await call.message.answer(f"Произошла непредвиденная ошибка:\n\n{exc}\nНапишите в техподдержку")
         else:
-            return await call.message.answer(
+            await call.message.answer(
                 text="Оплата прошла успешно!\n\n"\
                     "Отправили файлы на принтер ✅\n"
-                )        
+                )
+        await state.clear()

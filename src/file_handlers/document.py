@@ -9,9 +9,9 @@ from .handle_image import PNGFile, JPGFile
 # static typing dict
 docMapper = MappingProxyType({
     'pdf': PDFFile,
-    'docx': DocxFile,
-    'png': PNGFile,
-    'jpg': JPGFile
+    # 'docx': DocxFile,
+    # 'png': PNGFile,
+    # 'jpg': JPGFile
 })
 
 ALLOWED_FORMATS = list(docMapper.keys())
