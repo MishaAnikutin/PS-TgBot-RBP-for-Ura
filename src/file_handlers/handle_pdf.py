@@ -5,7 +5,7 @@ from .base import BaseFile
 
 
 class PDFFile(BaseFile):
-    def __init__(self, file_bytes: io.BytesIO) -> None:
+    def __init__(self, file_bytes: io.BytesIO, num_pages: int) -> None:
         self._bytes = file_bytes
         self._file = PdfReader(file_bytes)    
     

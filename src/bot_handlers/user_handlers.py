@@ -1,11 +1,14 @@
 import io 
+from typing import Optional
 from aiogram import Router, F, Bot
 from aiogram.fsm.context import FSMContext
 from aiogram.filters import Command, StateFilter
 from aiogram.types import Message, ReplyKeyboardRemove, ContentType, CallbackQuery
 
 from ..models.page_model import Page
-from ..models.user_model import FileModel, UserData
+from ..models.user_model import FileModel, PhotoModel, UserData
+from ..file_handlers.base import BasePhoto, BaseFile
+
 from ..states.user_states import HandleFileStates
 from ..printer_api import PrinterAPI
 from ..file_handlers import create_document, ALLOWED_FORMATS
@@ -49,8 +52,40 @@ async def cancel(callback_query: CallbackQuery, state: FSMContext):
 
 @user_router.message(F.content_type == ContentType.PHOTO, HandleFileStates.HandleFilesState)
 async def handle_photos(message: Message, state: FSMContext, bot: Bot):
-    await message.answer('Еще не добавили')
-    await state.clear()
+    await message.answer('Отправьте файлом')
+    # if photo_info := message.photo:
+    #     photo_bytes: io.BytesIO = await bot.download(photo_info[-1])
+    
+    # else:
+    #     await message.answer(
+    #         text='Отлично, фотографии получены. Сколько копий вам нужно распечатать?\n\n'
+    #             '(введите просто число, без лишних символов)',
+    #         reply_markup=await stop_keyboard(callback_factory=HandleFileCallback)
+    #     )
+
+    #     return await state.set_state(HandleFileStates.NumberOfCopiesState)
+
+    # user_data: Optional[UserData] = (await state.get_data()).get('user_data', None)
+    
+    # try:
+    #     document: BasePhoto = create_document(file_bytes=photo_bytes, file_path='.png', num_pages=1)
+    # except ValueError:
+    #     await message.answer(f'Неверный формат файлов, файл должен быть формата: {", ".join(ALLOWED_FORMATS)}')
+    #     return await state.clear()
+        
+    
+    # if user_data is None:
+    #     file_data = PhotoModel(filename='photo.png', document=[document], num_pages=1)
+    #     user_data = UserData(uid=message.chat.id, username=message.chat.username, file_data=file_data)
+    
+    # else:
+    #     documents: list = user_data.file_data.document + [document]
+    #     num_pages = user_data.file_data.num_pages + 1
+    #     file_data = PhotoModel(filename='photo.png', document=documents, num_pages=num_pages)
+    #     user_data.file_data = file_data
+    
+    # print(user_data.file_data)
+    # await state.set_data({'user_data': user_data})
     
 
 @user_router.message(F.content_type == ContentType.DOCUMENT, HandleFileStates.HandleFilesState)
@@ -74,8 +109,8 @@ async def handle_files(message: Message, state: FSMContext, bot: Bot):
     await state.set_data({'user_data': user_data})
     
     await message.answer(
-        text='Отлично, файл получен. Сколько копий файла вам нужно распечатать?\n\n'
-            '(введите просто число, без лишних символов)',
+        text=f'Отлично, файл {filename} получен. Сколько копий файла вам нужно распечатать?\n\n'
+             f'(введите просто число, без лишних символов)',
         reply_markup=await stop_keyboard(callback_factory=HandleFileCallback)
     )
 
