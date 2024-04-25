@@ -19,6 +19,9 @@ from ..database import CRUDActions, UserCRUDModel
 from ..states.user_states import HandleFileStates
 from ..callback_data import HandleFileCallback
 
+from ..payment import paymentFactory
+from ..payment.models import CreatePaymentModel, PaymentInfoModel, PaymentStatus
+
 
 user_router = Router()
 
@@ -177,10 +180,11 @@ async def make_purchase_handler(call: CallbackQuery, state: FSMContext):
     data: UserData = (await state.get_data())['user_data']
     value = data.value
     
-    # TODO: реализовать эквайринг
+    payment: CreatePaymentModel = await paymentFactory.create_payment(value=value)
     
-    link = 'https://tochka.com/' # Ссылка на оплату
-     
+    link = payment.Data.paymentLink
+    data.payment_id = payment.Data.operationId
+    
     await call.message.answer(
         text=f"Сумма к оплате: {value}\n"
              f"После оплаты, нажмите «Проверить оплату»",
@@ -191,20 +195,30 @@ async def make_purchase_handler(call: CallbackQuery, state: FSMContext):
 @user_router.callback_query(F.data == HandleFileCallback.CheckPayment)
 async def check_payment_handler(call: CallbackQuery, state: FSMContext):
     data: UserData = (await state.get_data())['user_data']
-    
-    print(data)
-    
-    # Реализация логики проверки оплаты  
-    is_succeed: bool = True 
-    
-    if is_succeed:
-        try:
-            await PrinterAPI.print_files(file=data.file_data.file_bytes, num_copies=data.num_copies)
-        except Exception as exc:
-            await call.message.answer(f"Произошла непредвиденная ошибка:\n\n{exc}\nНапишите в техподдержку")
-        else:
-            await call.message.answer(
-                text="Оплата прошла успешно!\n\n"\
-                    "Отправили файлы на принтер ✅\n"
-                )
-        await state.clear()
+    payment_information = await paymentFactory.get_payment_information(payment_id=data.payment_id)
+
+    # FIXME: неправильно парсится Operation, как list
+    payment_status = payment_information.Data.Operation[0]['status'] 
+        
+    match payment_status:
+        case PaymentStatus.APPROVED:            
+            try:
+                await PrinterAPI.print_files(file=data.file_data.file_bytes, num_copies=data.num_copies)
+            except Exception as exc:
+                await call.message.answer(f"Произошла непредвиденная ошибка:\n\n{exc}\nОтправили запрос на возврат средств, напишите в техподдержку")
+                await paymentFactory.refund_payment(payment_id=data.payment_id, amount=data.value) 
+            else:
+                await call.message.answer(text="Оплата прошла успешно!\n\nОтправили файлы на принтер ✅")
+            await state.clear()
+        
+        case PaymentStatus.CREATED:
+            await call.message.answer(text="Оплата еще не прошла прошла")
+            
+        case PaymentStatus.EXPIRED:
+            await call.message.answer(text="Истек срок действия оплаты, перенаправляем новую ссылку")
+            await state.set_state(HandleFileCallback.MakePurchase)
+            await make_purchase_handler(call=call, state=state)
+        
+        case _:
+            print('ээээээ хз че это')
+            

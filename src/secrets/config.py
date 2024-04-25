@@ -17,10 +17,9 @@ ADMIN_ID = [int(uid) for uid in os.getenv("ADMIN_ID").split(',')]
 
 PAGE_PRICE = os.getenv("PAGE_PRICE")
 
+PAYMENT_API = os.getenv("PAYMENT_API")
 PAYMENT_TOKEN = os.getenv("PAYMENT_TOKEN")
-PAYMENT_CONF1 = os.getenv("PAYMENT_CONF1")
-PAYMENT_CONF2 = os.getenv("PAYMENT_CONF2")
+CUSTOMER_CODE = os.getenv("CUSTOMER_CODE")
+REDIRECT_URL = os.getenv("REDIRECT_URL")
 
-RETURN_URL = 'https://t.me/prnt_server_bot'
-PAYMENT_API = "yookassa"
 PRINTER_API = os.getenv("PRINTER_API")

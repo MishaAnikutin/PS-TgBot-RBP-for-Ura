@@ -24,8 +24,13 @@ class PrinterAPI(BasePrinterAPI):
     async def print_files(cls, file: io.BytesIO, num_copies: int) -> None:     
         options = {"copies": str(num_copies)}
         
-        print(file)       
-        
+        if cls.Metadata.PRINTER_NAME not in cls.conn.getPrinters():
+            raise PrinterExceptions("Не удалось подключиться к принтеру")
+                
         with tempfile.NamedTemporaryFile(delete=False) as temp_file:
             temp_file.write(file.getbuffer())
-            cls.conn.printFile(cls.Metadata.PRINTER_NAME, temp_file.name, "Print Job", options)
+            print_job = cls.conn.printFile(cls.Metadata.PRINTER_NAME, temp_file.name, "Print Job", options)
+
+        if not print_job:
+            raise PrinterExceptions("Не удалось распечатать файл")
+        
