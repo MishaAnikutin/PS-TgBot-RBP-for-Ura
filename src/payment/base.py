@@ -1,13 +1,20 @@
-from abc import ABC, abstractmethod
+from abc import ABC, abstractmethod, abstractclassmethod
 
 
 class BasePayment(ABC):
+    @classmethod
     @abstractmethod
-    async def create_payment(self, value):
+    async def create_payment(cls, value):
+        ...
+        
+    @classmethod
+    @abstractmethod
+    async def get_payment_information(cls, payment_id):
         ...
     
+    @classmethod
     @abstractmethod
-    async def check_payment(cls):
+    async def refund_payment(cls, payment_id, amount):
         ...
         
         

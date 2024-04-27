@@ -8,6 +8,7 @@ if os.path.exists(dotenv_path):
     load_dotenv(dotenv_path)
     
 
+TEST_PURCHASE_FLAG = os.getenv("TEST_PURCHASE_FLAG")
 API_TOKEN = os.getenv("API_TOKEN")
 
 PRINTER_HOST = os.getenv("PRINTER_HOST")

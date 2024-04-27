@@ -175,6 +175,16 @@ async def reset_handler(call: CallbackQuery, state: FSMContext):
     await call.message.answer(text='Покупка отменена')
 
 
+@user_router.callback_query(F.data == HandleFileCallback.FakePyrchase)
+async def fake_purchase_handler(call: CallbackQuery, state: FSMContext):
+    await call.message.answer(
+        text = 'Оплачивать пока рано)\n\nЖдем на открытии 2 мая🥳',
+        reply_markup=await stop_keyboard(callback_factory=HandleFileCallback, text='Назад')
+    )
+    
+    await state.clear()
+
+
 @user_router.callback_query(F.data == HandleFileCallback.MakePurchase)
 async def make_purchase_handler(call: CallbackQuery, state: FSMContext):
     data: UserData = (await state.get_data())['user_data']

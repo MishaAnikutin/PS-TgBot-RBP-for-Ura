@@ -4,12 +4,19 @@ from aiogram.utils.keyboard import (
 )
 from enum import Enum
 from ..callback_data import HandleFileCallback, AdminCallback
-
+from ..secrets.config import TEST_PURCHASE_FLAG
 
 async def yesno_keyboard():
     menu_builder = InlineKeyboardBuilder()
+    
+    print(TEST_PURCHASE_FLAG)
+    print(HandleFileCallback.FakePyrchase if TEST_PURCHASE_FLAG else HandleFileCallback.MakePurchase)
 
-    menu_builder.button(text='Продолжить', callback_data=HandleFileCallback.MakePurchase)
+    menu_builder.button(
+            text='Продолжить',
+            callback_data=HandleFileCallback.FakePyrchase if TEST_PURCHASE_FLAG else HandleFileCallback.MakePurchase
+        )
+    
     menu_builder.button(text='Отменить', callback_data=HandleFileCallback.CancelPurchase)
 
     return menu_builder.as_markup()
