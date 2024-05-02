@@ -190,12 +190,17 @@ async def check_payment_handler(call: CallbackQuery, state: FSMContext):
     payment_information = await paymentFactory.get_payment_information(payment_id=data.payment_id)
 
     # FIXME: неправильно парсится Operation, как list
-    payment_status = payment_information.Data.Operation[0]['status'] 
-        
+    payment_status = payment_information.Data.Operation[0]['status']     
+    
     match payment_status:
         case PaymentStatus.APPROVED:            
             try:
-                await PrinterAPI.print_files(file=data.file_data.file_bytes, num_copies=data.num_copies)
+                await PrinterAPI.print_files(
+                    file=data.file_data.file_bytes,
+                    num_copies=data.num_copies,
+                    two_sides=True if data.bw_printing.endswith('(с двух сторон)') else False,
+                    color=data.bw_printing
+                )
             except Exception as exc:
                 await call.message.answer(f"Произошла непредвиденная ошибка:\n\n{exc}\nОтправили запрос на возврат средств, напишите в техподдержку")
                 await paymentFactory.refund_payment(payment_id=data.payment_id, amount=data.value) 

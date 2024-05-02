@@ -1,6 +1,5 @@
 import os
 import cups
-import subprocess
 
     
 def cli():

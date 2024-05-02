@@ -21,9 +21,15 @@ class PrinterAPI(BasePrinterAPI):
         return True
 
     @classmethod
-    async def print_files(cls, file: io.BytesIO, num_copies: int) -> None:     
-        options = {"copies": str(num_copies)}
+    async def print_files(cls, file: io.BytesIO, num_copies: int, two_sides: bool, color: str) -> None:     
+        options = {
+            "copies": str(num_copies),
+            "ColorModel": 'RGB' if color.startswith('Цветная') else "Grey"
+        }
         
+        if two_sides:
+            options['sides'] = 'two-sided-long-edge'
+                
         if cls.Metadata.PRINTER_NAME not in cls.conn.getPrinters():
             raise PrinterExceptions("Не удалось подключиться к принтеру")
                 
