@@ -25,7 +25,8 @@ class UserData:
     uid: int
     username: str
     file_data: Union[FileModel, PhotoModel]
-    num_copies: Optional[int] = None 
-    payment_id: Optional[str] = None 
+    num_copies: Optional[int] = None
+    bw_printing: Optional[str] = None
+    payment_id: Optional[str] = None
     value: Optional[int] = None
-    payment_action: Optional[paymentFactory] = None 
+    payment_action: Optional[paymentFactory] = None

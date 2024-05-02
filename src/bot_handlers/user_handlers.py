@@ -5,7 +5,7 @@ from aiogram.fsm.context import FSMContext
 from aiogram.filters import Command, StateFilter
 from aiogram.types import Message, ReplyKeyboardRemove, ContentType, CallbackQuery
 
-from ..models.page_model import Page
+from ..models.page_model import Page, PageColors
 from ..models.user_model import FileModel, PhotoModel, UserData
 from ..file_handlers.base import BasePhoto, BaseFile
 
@@ -13,7 +13,7 @@ from ..states.user_states import HandleFileStates
 from ..printer_api import PrinterAPI
 from ..file_handlers import create_document, ALLOWED_FORMATS
 
-from ..utils.keyboards import yesno_keyboard, stop_keyboard, payment_keyboard
+from ..utils.keyboards import (yesno_keyboard, stop_keyboard, payment_keyboard, bw_print_keyboard)
 from ..database import CRUDActions, UserCRUDModel
 
 from ..states.user_states import HandleFileStates
@@ -56,40 +56,7 @@ async def cancel(callback_query: CallbackQuery, state: FSMContext):
 @user_router.message(F.content_type == ContentType.PHOTO, HandleFileStates.HandleFilesState)
 async def handle_photos(message: Message, state: FSMContext, bot: Bot):
     await message.answer('Отправьте файлом')
-    # if photo_info := message.photo:
-    #     photo_bytes: io.BytesIO = await bot.download(photo_info[-1])
-    
-    # else:
-    #     await message.answer(
-    #         text='Отлично, фотографии получены. Сколько копий вам нужно распечатать?\n\n'
-    #             '(введите просто число, без лишних символов)',
-    #         reply_markup=await stop_keyboard(callback_factory=HandleFileCallback)
-    #     )
 
-    #     return await state.set_state(HandleFileStates.NumberOfCopiesState)
-
-    # user_data: Optional[UserData] = (await state.get_data()).get('user_data', None)
-    
-    # try:
-    #     document: BasePhoto = create_document(file_bytes=photo_bytes, file_path='.png', num_pages=1)
-    # except ValueError:
-    #     await message.answer(f'Неверный формат файлов, файл должен быть формата: {", ".join(ALLOWED_FORMATS)}')
-    #     return await state.clear()
-        
-    
-    # if user_data is None:
-    #     file_data = PhotoModel(filename='photo.png', document=[document], num_pages=1)
-    #     user_data = UserData(uid=message.chat.id, username=message.chat.username, file_data=file_data)
-    
-    # else:
-    #     documents: list = user_data.file_data.document + [document]
-    #     num_pages = user_data.file_data.num_pages + 1
-    #     file_data = PhotoModel(filename='photo.png', document=documents, num_pages=num_pages)
-    #     user_data.file_data = file_data
-    
-    # print(user_data.file_data)
-    # await state.set_data({'user_data': user_data})
-    
 
 @user_router.message(F.content_type == ContentType.DOCUMENT, HandleFileStates.HandleFilesState)
 async def handle_files(message: Message, state: FSMContext, bot: Bot):
@@ -112,9 +79,8 @@ async def handle_files(message: Message, state: FSMContext, bot: Bot):
     await state.set_data({'user_data': user_data})
     
     await message.answer(
-        text=f'Отлично, файл {filename} получен. Сколько копий файла вам нужно распечатать?\n\n'
-             f'(введите просто число, без лишних символов)',
-        reply_markup=await stop_keyboard(callback_factory=HandleFileCallback)
+        text=f'Отлично, файл {filename} получен. Вам нужна цветная или черно-белая печать?\n\n',
+        reply_markup=await bw_print_keyboard()
     )
 
     await state.set_state(HandleFileStates.NumberOfCopiesState)
@@ -137,6 +103,19 @@ async def handle_files_error(message: Message):
     return await message.answer("Пришлите файл!", reply_markup=await stop_keyboard(callback_factory=HandleFileCallback))
 
 
+
+@user_router.callback_query(F.data.startswith(HandleFileCallback.PrintingColor))
+async def handle_colorpaper(call: CallbackQuery, state: FSMContext):
+    color = call.data.split(':')[-1] #printing_color:цветная печать -> цветная печать
+    
+    data: UserData = (await state.get_data())['user_data']
+    
+    data.bw_printing = color
+    await state.set_data({'user_data': data})
+    
+    await call.message.answer(f"Отлично! Сколько копий тебе нужно?")
+    await state.set_state(HandleFileStates.NumberOfCopiesState)
+
 @user_router.message(HandleFileStates.NumberOfCopiesState)
 async def handle_number_of_copies(message: Message, state: FSMContext):
     try:
@@ -149,7 +128,9 @@ async def handle_number_of_copies(message: Message, state: FSMContext):
     
     printer_capacity = await PrinterAPI.get_printer_capacity()
     total_pages = data.file_data.num_pages * num_of_copies
-    data.value = Page.total_value(total_pages)
+    
+    page = Page(page_color = data.bw_printing)
+    data.value = page.total_value(total_pages)
     
     if printer_capacity < total_pages:
         await state.clear()
@@ -163,7 +144,8 @@ async def handle_number_of_copies(message: Message, state: FSMContext):
     await state.set_data({'user_data': data})
     await message.answer(
         f"Отлично! Тогда, получается:\n\n"\
-        f"- {num_of_copies} копии(-й) файла {data.file_data.filename} ({data.file_data.num_pages} страниц)\n\n"
+        f"- {num_of_copies} копии(-й) файла {data.file_data.filename} ({data.file_data.num_pages} страниц) "\
+        f"печать: {data.bw_printing}\n\n"
         f"Итого выйдет: {data.value} руб.",
         reply_markup=await yesno_keyboard()
     )

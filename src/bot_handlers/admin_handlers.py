@@ -6,6 +6,7 @@ from aiogram.fsm.context import FSMContext
 from aiogram.filters import Command, StateFilter
 from aiogram.types import Message, ReplyKeyboardRemove, ContentType, CallbackQuery
 
+from aiogram.types import FSInputFile
 from ..utils.keyboards import admin_keyboard, stop_keyboard
 from ..database import CRUDActions, UserCRUDModel
 
@@ -29,6 +30,14 @@ async def admin(message: Message, state: FSMContext):
           reply_markup=await admin_keyboard()
         )
 
+
+@admin_router.callback_query(F.data == AdminCallback.GetSQLite, UserInAdminsFilter())
+async def start_mailing(call: CallbackQuery, state: FSMContext):
+    db_file = FSInputFile('src/database/db.sqlite')
+    await call.message.answer_document(document=db_file, caption='Держи!', reply_markup=ReplyKeyboardRemove())
+
+
+    await state.set_state(MailingStates.GetMailingMessageState)
 
 @admin_router.callback_query(F.data == AdminCallback.Reset)
 async def cancel(call: CallbackQuery, state: FSMContext):

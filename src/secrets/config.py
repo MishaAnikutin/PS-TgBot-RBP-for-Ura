@@ -16,10 +16,16 @@ PRINTER_PORT = os.getenv("PRINTER_PORT")
 
 ADMIN_ID = [int(uid) for uid in os.getenv("ADMIN_ID").split(',')]
 
-PAGE_PRICE = os.getenv("PAGE_PRICE")
+BW_PAGE_PRICE = os.getenv("BW_PAGE_PRICE")
+COLORED_PAGE_PRICE = os.getenv("COLORED_PAGE_PRICE")
+BW2_PAGE_PRICE = os.getenv("BW2_PAGE_PRICE")
+COLORED2_PAGE_PRICE = os.getenv("COLORED2_PAGE_PRICE")
 
 PAYMENT_API = os.getenv("PAYMENT_API")
+CLIENT_ID = os.getenv("CLIENT_ID")
+CLIENT_SECRET = os.getenv("CLIENT_SECRET")
 PAYMENT_TOKEN = os.getenv("PAYMENT_TOKEN")
+REFRESH_TOKEN = os.getenv("REFRESH_TOKEN")
 CUSTOMER_CODE = os.getenv("CUSTOMER_CODE")
 REDIRECT_URL = os.getenv("REDIRECT_URL")
 
