@@ -5,7 +5,9 @@
 This template is designed for remote printing tasks, sending files to them via a telegram bot located in Raspberry-Pi and connected directly to the printer
 
 # Installing 
-firstly, connect your printer (via USB-b, Ethernet or Wi-Fi) to configured Raspberry-Pi 
+firstly, connect your printer (via USB-b using instructions: https://dzen.ru/a/YyX2FnNQynfDVGn2)
+
+to configured Raspberry-Pi 
 
 Secondly, clone this repository to your Raspberry-Pi:
 ```bash
