@@ -17,7 +17,7 @@ git clone https://github.com/MishaAnikutin/PS-TgBot-RBP-for-Ura.git
 
 Next step, run setup script
 ```bash 
-sudo cmod +x ./setup.sh && ./setup.sh
+sudo chmod +x ./setup.sh && ./setup.sh
 ```
 It will install all requirements
 
