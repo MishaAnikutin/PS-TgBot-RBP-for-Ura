@@ -24,4 +24,4 @@ class PrinterExceptions(Exception):
         self.message = message
 
     def __str__(self):
-        return f'DBException: {self.message}'
+        return f'PrinterExceptions: {self.message}'

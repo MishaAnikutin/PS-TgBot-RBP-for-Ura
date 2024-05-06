@@ -8,7 +8,7 @@ from ..file_handlers.document import BaseFile
 
 class PrinterAPI(BasePrinterAPI):
     class Metadata:
-        PRINTER_NAME = 'Kyocera_ECOSYS_P3145dn_'
+        PRINTER_NAME = 'Kyocera_ECOSYS_P3145dn'
     
     conn = cups.Connection()
     
