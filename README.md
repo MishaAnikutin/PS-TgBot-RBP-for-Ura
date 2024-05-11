@@ -1,6 +1,5 @@
 # Print-Server with Telegram-bot client and Raspberry-pi server
 This template is designed for remote printing tasks, sending files to them via a telegram bot located in Raspberry-Pi and connected directly to the printer
-**NOT STABLE VERSION!**
 
 # Architecture:
 [Figma's board](https://www.figma.com/file/xJomjKpzGFbDnQwvDVy4LW/%D0%9E%D0%B1%D0%BB%D0%B0%D1%87%D0%BD%D0%B0%D1%8F-%D0%B0%D1%80%D1%85%D0%B8%D1%82%D0%B5%D0%BA%D1%82%D1%83%D1%80%D0%B0-Digital-Typography?type=whiteboard&node-id=0-1&t=iMTPc3xABizq2heL-0)
